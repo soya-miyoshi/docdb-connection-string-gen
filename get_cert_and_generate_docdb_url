@@ -20,8 +20,7 @@ password=$(echo $secret | jq -r .password)
 
 # Check if the global-bundle.pem file exists in the current directory
 if [ ! -f "./global-bundle.pem" ]; then
-    echo "Downloading global-bundle.pem..."
-    wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+    wget -q https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
 fi
 
 # Construct the connection string
