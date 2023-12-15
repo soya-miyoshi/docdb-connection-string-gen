@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Check if two arguments are passed
+if [ $# -ne 2 ]; then
+    echo "Usage: $0 <cname> <secret_arn>"
+    exit 1
+fi
+
+cname=$1
+secret_arn=$2
+
+host=$(dig +noall +answer CNAME ${cname} | awk '{print $NF}')
+
+# Fetch the secret from Secrets Manager
+secret=$(aws secretsmanager get-secret-value --secret-id ${secret_arn} --region ap-northeast-1 --query 'SecretString' --output text)
+
+# Extract username and password
+username=$(echo $secret | jq -r .username)
+password=$(echo $secret | jq -r .password)
+
+# Check if the global-bundle.pem file exists in the current directory
+if [ ! -f "./global-bundle.pem" ]; then
+    echo "Downloading global-bundle.pem..."
+    wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+fi
+
+# Construct the connection string
+# Use the default value for retryWrites
+echo "mongodb://$username:$password@$host:27017/?tls=true&tlsCAFile=./global-bundle.pem"
