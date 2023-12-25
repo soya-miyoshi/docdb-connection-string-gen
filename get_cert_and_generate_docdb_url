@@ -12,7 +12,7 @@ secret_arn=$2
 host=$(dig +noall +answer CNAME ${cname} | awk '{print $NF}')
 
 # Fetch the secret from Secrets Manager
-secret=$(aws secretsmanager get-secret-value --secret-id ${secret_arn} --region ap-northeast-1 --query 'SecretString' --output text)
+secret=$(aws secretsmanager get-secret-value --secret-id ${secret_arn} --query 'SecretString' --output text)
 
 # Extract username and password
 username=$(echo $secret | jq -r .username)
